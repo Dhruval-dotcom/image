@@ -34,16 +34,13 @@
         textarea,
         #category {
             width: 95%;
-            padding: 10px;
-            margin: 10px 0;
+            padding: 5px;
+            margin: 5px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 16px;
         }
-        #category {
-            width: 30% !important;
-            margin-right: 20px;
-        }
+       
 
         button {
             background: #007bff;
@@ -70,7 +67,8 @@
             background: #f8f9fa;
             padding: 10px;
             border-radius: 5px;
-            min-height: 50px;
+            max-height: 190px;
+            overflow-y: scroll;
             font-size: 12px;
             word-wrap: break-word;
             text-align: left;
@@ -79,34 +77,57 @@
         #response-text pre{
             white-space: break-spaces;
         }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: bold;
+            display: block;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Upload Image & Provide Prompt</h2>
         <form id="upload-form" enctype="multipart/form-data">
-            <div style="display: flex; justify-content: space-between;">
+            <div class="form-group">
+                <label for="category">Select Category*:</label>
                 <select name="category" id="category">
                     <option value="gemini">gemini (gemini-2.0-flash)</option>
                     <option value="openai">openai (gpt-4o)</option>
                 </select>
+            </div>
+            <div class="form-group">
+                <label for="image">Upload Image*:</label>
                 <input type="file" name="image" accept="image/*" required><br>
             </div>
-
-            <textarea 
-                name="prompt" 
-                placeholder="Enter your prompt" 
-                rows="4"
-                required>generate seo optimized title and description based on provided image and output must be json only no any extra text and provide title in title key and description in description key.
-            </textarea><br>
-            <textarea 
-                name="additional_prompt" 
-                placeholder="Enter your prompt" 
-                ></textarea><br>
+            <div class="form-group">
+                <label for="image">Base Prompt*:</label>
+                <textarea 
+                    name="prompt" 
+                    placeholder="Enter your prompt" 
+                    rows="4"
+                    required>generate seo optimized title and description based on provided image and output must be json only no any extra text and provide title in title key and description in description key.
+                </textarea><br>
+            </div>
+            <div class="form-group">
+                <label for="image">User Prompt:</label>
+                <textarea 
+                    name="additional_prompt" 
+                    placeholder="Enter your prompt" 
+                    ></textarea><br>
+            </div>
+            
             <button id="submit-btn" type="submit">Analyze</button>
         </form>
         <h3>Response:</h3>
-        <p id="response-text"></p>
+        <p id="response-text">
+             
+        </p>
     </div>
     <script src=
     "https://cdnjs.cloudflare.com/ajax/libs/marked/2.0.2/marked.min.js"></script>
@@ -114,17 +135,29 @@
         document.getElementById("upload-form").addEventListener("submit", async function(event) {
             event.preventDefault();
             let formData = new FormData(this);
-            document.getElementById("response-text").innerHTML = "Processing request...";
+
             document.getElementById("submit-btn").innerHTML = "loading...";
-
-            let response = await fetch("https://dhruval-image.vercel.app/analyze", {
-                method: "POST",
-                body: formData
-            });
-            document.getElementById("submit-btn").innerHTML = "Analyze";
-
+            const startTime = Date.now();
+            let response;
+            try {
+                response = await fetch("https://dhruval-image.vercel.app/analyze", {
+                    method: "POST",
+                    body: formData
+                });
+            } catch (e) {
+                document.getElementById("response-text").innerHTML += e.message || "Error processing request.";
+                return;
+            } finally {
+                document.getElementById("submit-btn").innerHTML = "Analyze";
+            }
+            const endTime = Date.now();
+            const time = (endTime - startTime) / 1000;
             let data = await response.json();
-            document.getElementById("response-text").innerHTML = marked(data.response) || "Error processing request.";
+            document.getElementById("response-text").innerHTML = 
+                ("<b>model:</b> " + data.category + "<br>" + 
+                "<b>response:</b> " + marked(data.response) + "<br>" + 
+                "<b>time:</b> " + time + "seconds" + "<br><br><hr />") + 
+                document.getElementById("response-text").innerHTML;
         });
     </script>
 </body>
