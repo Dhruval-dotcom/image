@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Image Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #74ebd5, #acb6e5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        input[type="file"],
+        textarea,
+        #category {
+            width: 95%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        #category {
+            width: 30% !important;
+            margin-right: 20px;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 100%;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        h3 {
+            color: #333;
+            margin-top: 20px;
+        }
+
+        #response-text {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            min-height: 50px;
+            font-size: 12px;
+            word-wrap: break-word;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Upload Image & Provide Prompt</h2>
+        <form id="upload-form" enctype="multipart/form-data">
+            <div style="display: flex; justify-content: space-between;">
+                <select name="category" id="category">
+                    <option value="gemini">gemini</option>
+                    <option value="openai">openai</option>
+                </select>
+                <input type="file" name="image" accept="image/*" required><br>
+            </div>
+
+            <textarea name="prompt" placeholder="Enter your prompt" required></textarea><br>
+            <button id="submit-btn" type="submit">Analyze</button>
+        </form>
+        <h3>Response:</h3>
+        <p id="response-text"></p>
+    </div>
+
+    <script>
+        document.getElementById("upload-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            let formData = new FormData(this);
+            document.getElementById("response-text").innerHTML = "Processing request...";
+            document.getElementById("submit-btn").innerHTML = "loading...";
+
+            let response = await fetch("https://dhruval-image.vercel.app/analyze", {
+                method: "POST",
+                body: formData
+            });
+
+            let data = await response.json();
+            document.getElementById("response-text").innerHTML = data.response || "Error processing request.";
+        });
+    </script>
+</body>
+</html>
