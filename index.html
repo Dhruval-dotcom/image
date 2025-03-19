@@ -75,6 +75,10 @@
             word-wrap: break-word;
             text-align: left;
         }
+
+        #response-text pre{
+            white-space: break-spaces;
+        }
     </style>
 </head>
 <body>
@@ -89,13 +93,23 @@
                 <input type="file" name="image" accept="image/*" required><br>
             </div>
 
-            <textarea name="prompt" placeholder="Enter your prompt" required></textarea><br>
+            <textarea 
+                name="prompt" 
+                placeholder="Enter your prompt" 
+                rows="4"
+                required>generate seo optimized title and description based on provided image and output must be json only no any extra text and provide title in title key and description in description key.
+            </textarea><br>
+            <textarea 
+                name="additional_prompt" 
+                placeholder="Enter your prompt" 
+                ></textarea><br>
             <button id="submit-btn" type="submit">Analyze</button>
         </form>
         <h3>Response:</h3>
         <p id="response-text"></p>
     </div>
-
+    <script src=
+    "https://cdnjs.cloudflare.com/ajax/libs/marked/2.0.2/marked.min.js"></script>
     <script>
         document.getElementById("upload-form").addEventListener("submit", async function(event) {
             event.preventDefault();
@@ -110,7 +124,7 @@
             document.getElementById("submit-btn").innerHTML = "Analyze";
 
             let data = await response.json();
-            document.getElementById("response-text").innerHTML = data.response || "Error processing request.";
+            document.getElementById("response-text").innerHTML = marked(data.response) || "Error processing request.";
         });
     </script>
 </body>
