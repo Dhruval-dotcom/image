@@ -107,6 +107,7 @@
                 method: "POST",
                 body: formData
             });
+            document.getElementById("submit-btn").innerHTML = "Analyze";
 
             let data = await response.json();
             document.getElementById("response-text").innerHTML = data.response || "Error processing request.";
